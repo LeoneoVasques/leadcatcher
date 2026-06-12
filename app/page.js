@@ -85,11 +85,12 @@ export default function Home() {
       {/* Container Principal do Formulário */}
       <div className="w-full max-w-md p-8 sm:p-10 bg-[#4d4d4d] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-neutral-600 relative z-10">
         
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">
-            Switch<span className="text-[#15c2ea]">Pay</span>
-          </h1>
-          <p className="text-neutral-300 text-sm font-medium tracking-wide uppercase">Captação de Leads</p>
+        <div className="mb-8 text-center flex flex-col items-center">
+          <img 
+            src="https://github.com/LeoneoVasques/swp-email-assets/blob/main/logo-horizontal-color.png?raw=true" 
+            alt="SwitchPay Logo" 
+            className="h-10 mb-2 object-contain"
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -100,7 +101,7 @@ export default function Home() {
           )}
           
           <div className="space-y-1.5">
-            <label htmlFor="empresa" className="text-sm font-semibold text-neutral-200 ml-1">Nome da Empresa</label>
+            <label htmlFor="empresa" className="text-sm font-semibold text-neutral-200 ml-1">Nome OU Nome da Empresa</label>
             <input
               type="text"
               id="empresa"
@@ -128,7 +129,7 @@ export default function Home() {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="email" className="text-sm font-semibold text-neutral-200 ml-1">E-mail Corporativo</label>
+            <label htmlFor="email" className="text-sm font-semibold text-neutral-200 ml-1">E-mail</label>
             <input
               type="email"
               id="email"
@@ -155,7 +156,7 @@ export default function Home() {
                 <span>Processando...</span>
               </>
             ) : (
-              <span>Registrar Lead</span>
+              <span>Enviar</span>
             )}
           </button>
         </form>
@@ -173,7 +174,7 @@ export default function Home() {
             
             <h2 className="text-2xl font-extrabold text-white mb-2">Sucesso!</h2>
             <p className="text-neutral-300 mb-8 font-medium">
-              Os dados do lead foram registrados de forma segura.
+              Obrigado por escolher a SwitchPay!<br />Entraremos em contato em breve.
             </p>
             
             <button 

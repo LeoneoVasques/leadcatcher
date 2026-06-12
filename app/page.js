@@ -9,14 +9,14 @@ export default function Home() {
     email: '',
   });
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
 
   const handlePhoneChange = (e) => {
     let value = e.target.value.replace(/\D/g, '');
     if (value.length > 11) value = value.slice(0, 11);
     
-    // Format: (XX) XXXXX-XXXX
+    // Formatação automática para: (XX) XXXXX-XXXX
     let formatted = value;
     if (value.length > 2) {
       formatted = `(${value.slice(0, 2)}) ${value.slice(2)}`;
@@ -37,7 +37,7 @@ export default function Home() {
     e.preventDefault();
     setError('');
 
-    // Validations
+    // Validações
     if (!formData.empresa.trim() || !formData.telefone.trim() || !formData.email.trim()) {
       setError('Por favor, preencha todos os campos.');
       return;
@@ -61,8 +61,8 @@ export default function Home() {
       });
       
       if (res.ok) {
-        setSuccess(true);
-        setFormData({ empresa: '', telefone: '', email: '' });
+        setShowModal(true); // Abre o Modal em vez de trocar a tela inteira
+        setFormData({ empresa: '', telefone: '', email: '' }); // Limpa o formulário atrás do modal
       } else {
         const data = await res.json();
         setError(data.error || 'Erro ao enviar dados. Tente novamente.');
@@ -75,96 +75,116 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-100 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md p-8 bg-neutral-800 rounded-2xl shadow-2xl border border-neutral-700">
-        <h1 className="text-3xl font-bold mb-2 text-center text-white tracking-tight">Captura de Leads</h1>
-        <p className="text-neutral-400 mb-8 text-center text-sm">Registre os dados do contato abaixo</p>
+    <main className="min-h-screen bg-neutral-900 text-neutral-100 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      
+      {/* Background Decorativo com as cores da SwitchPay */}
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#15c2ea] to-[#00fecf]"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#15c2ea]/10 blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#00fecf]/10 blur-[120px] pointer-events-none"></div>
 
-        {success ? (
-          <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
-            <div className="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      {/* Container Principal do Formulário */}
+      <div className="w-full max-w-md p-8 sm:p-10 bg-[#4d4d4d] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-neutral-600 relative z-10">
+        
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">
+            Switch<span className="text-[#15c2ea]">Pay</span>
+          </h1>
+          <p className="text-neutral-300 text-sm font-medium tracking-wide uppercase">Captação de Leads</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-center font-medium animate-in fade-in">
+              {error}
+            </div>
+          )}
+          
+          <div className="space-y-1.5">
+            <label htmlFor="empresa" className="text-sm font-semibold text-neutral-200 ml-1">Nome da Empresa</label>
+            <input
+              type="text"
+              id="empresa"
+              name="empresa"
+              value={formData.empresa}
+              onChange={handleChange}
+              placeholder="Ex: Tech Solutions"
+              className="w-full bg-neutral-800 border-2 border-transparent text-white placeholder-neutral-500 rounded-xl px-4 py-3.5 focus:outline-none focus:border-[#15c2ea] focus:ring-1 focus:ring-[#15c2ea] transition-all shadow-inner"
+              required
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="telefone" className="text-sm font-semibold text-neutral-200 ml-1">Telefone</label>
+            <input
+              type="tel"
+              id="telefone"
+              name="telefone"
+              value={formData.telefone}
+              onChange={handlePhoneChange}
+              placeholder="(11) 99999-9999"
+              className="w-full bg-neutral-800 border-2 border-transparent text-white placeholder-neutral-500 rounded-xl px-4 py-3.5 focus:outline-none focus:border-[#15c2ea] focus:ring-1 focus:ring-[#15c2ea] transition-all shadow-inner"
+              required
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="text-sm font-semibold text-neutral-200 ml-1">E-mail Corporativo</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="contato@empresa.com"
+              className="w-full bg-neutral-800 border-2 border-transparent text-white placeholder-neutral-500 rounded-xl px-4 py-3.5 focus:outline-none focus:border-[#15c2ea] focus:ring-1 focus:ring-[#15c2ea] transition-all shadow-inner"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-[#15c2ea] to-[#11a9cc] hover:from-[#00fecf] hover:to-[#00fecf] disabled:opacity-70 disabled:cursor-not-allowed text-neutral-900 font-extrabold text-lg py-4 px-4 rounded-xl transition-all duration-300 mt-4 flex items-center justify-center space-x-2 shadow-lg shadow-[#15c2ea]/30 transform hover:-translate-y-0.5 active:translate-y-0"
+          >
+            {loading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-neutral-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Processando...</span>
+              </>
+            ) : (
+              <span>Registrar Lead</span>
+            )}
+          </button>
+        </form>
+      </div>
+
+      {/* Modal de Sucesso (Popup) */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#4d4d4d] w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-neutral-600 flex flex-col items-center text-center transform animate-in zoom-in-95 duration-200">
+            <div className="w-20 h-20 bg-[#00fecf]/10 rounded-full flex items-center justify-center mb-6 shadow-inner ring-1 ring-[#00fecf]/30">
+              <svg className="w-10 h-10 text-[#00fecf]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold mb-6">Obrigado! Dados registrados.</h2>
+            
+            <h2 className="text-2xl font-extrabold text-white mb-2">Sucesso!</h2>
+            <p className="text-neutral-300 mb-8 font-medium">
+              Os dados do lead foram registrados de forma segura.
+            </p>
+            
             <button 
-              onClick={() => setSuccess(false)}
-              className="w-full bg-neutral-700 hover:bg-neutral-600 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200"
+              onClick={() => setShowModal(false)}
+              className="w-full bg-gradient-to-r from-[#15c2ea] to-[#11a9cc] hover:from-[#00fecf] hover:to-[#00fecf] text-neutral-900 font-extrabold text-lg py-3.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-[#15c2ea]/30"
             >
-              Cadastrar novo lead
+              Novo Cadastro
             </button>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl text-sm text-center">
-                {error}
-              </div>
-            )}
-            
-            <div className="space-y-1">
-              <label htmlFor="empresa" className="text-sm font-medium text-neutral-300">Nome da Empresa</label>
-              <input
-                type="text"
-                id="empresa"
-                name="empresa"
-                value={formData.empresa}
-                onChange={handleChange}
-                placeholder="Ex: Tech Solutions"
-                className="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                required
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label htmlFor="telefone" className="text-sm font-medium text-neutral-300">Telefone</label>
-              <input
-                type="tel"
-                id="telefone"
-                name="telefone"
-                value={formData.telefone}
-                onChange={handlePhoneChange}
-                placeholder="(11) 99999-9999"
-                className="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                required
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label htmlFor="email" className="text-sm font-medium text-neutral-300">E-mail Corporativo</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="contato@empresa.com"
-                className="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 mt-4 flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/30"
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Enviando...</span>
-                </>
-              ) : (
-                <span>Registrar Lead</span>
-              )}
-            </button>
-          </form>
-        )}
-      </div>
+        </div>
+      )}
     </main>
   );
 }

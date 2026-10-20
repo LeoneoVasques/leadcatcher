@@ -21,18 +21,29 @@ export default function DisplayPage() {
           setUrl(data.url);
           setStatus('online');
         } else {
-          setUrl('');
-          setStatus('connecting');
+          // Quando estiver na Vercel (ou sem túnel ativo), usa o próprio domínio fixo
+          if (typeof window !== 'undefined') {
+            setUrl(window.location.origin);
+            setStatus('online');
+          } else {
+            setUrl('');
+            setStatus('connecting');
+          }
         }
       } catch {
         if (isMounted) {
-          setStatus('offline');
+          if (typeof window !== 'undefined') {
+            setUrl(window.location.origin);
+            setStatus('online');
+          } else {
+            setStatus('offline');
+          }
         }
       }
     };
 
     fetchUrl();
-    const intervalId = setInterval(fetchUrl, 3000);
+    const intervalId = setInterval(fetchUrl, 5000);
 
     return () => {
       isMounted = false;
@@ -89,11 +100,25 @@ export default function DisplayPage() {
           )}
         </div>
 
-        {/* Link / Status abaixo do QR Code */}
+        {/* Link / Status abaixo do QR Code e Download */}
         {url && (
-          <div className="mt-4 flex items-center space-x-2 text-xs sm:text-sm text-neutral-400 bg-neutral-900/80 px-4 py-1.5 rounded-full border border-neutral-800">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span className="font-mono text-neutral-300 truncate max-w-xs sm:max-w-md">{url}</span>
+          <div className="mt-4 flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex items-center space-x-2 text-xs sm:text-sm text-neutral-400 bg-neutral-900/80 px-4 py-1.5 rounded-full border border-neutral-800">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span className="font-mono text-neutral-300 truncate max-w-xs sm:max-w-md">{url}</span>
+            </div>
+
+            <a
+              href="/qrcode-switchpay-print.svg"
+              download="qrcode-switchpay-alta-resolucao.svg"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#15c2ea]/15 hover:bg-[#15c2ea]/25 text-[#15c2ea] border border-[#15c2ea]/30 transition-all hover:scale-105"
+              title="Baixar vetor SVG em altíssima resolução para gráficas, banners e totens"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>Baixar QR p/ Impressão (SVG)</span>
+            </a>
           </div>
         )}
       </div>
